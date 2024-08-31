@@ -22,7 +22,7 @@ import review.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', authentification.views.login_page, name='login'),
+    path('', authentification.views.LoginPage.as_view(), name='login'),
     path('logout', authentification.views.logout_user, name='logout'),
     path('home/', review.views.home, name='home')
 ]
