@@ -6,7 +6,7 @@ from .models import User
 class SignupForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
-        fieds = ["username","email","first_name", "last_name"]
+        fields = ["username","email","first_name", "last_name"]
         
 
 class LoginForm(forms.Form):
