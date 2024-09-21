@@ -30,7 +30,12 @@ urlpatterns = [
     path('logout', views.logout_user, name='logout'),
     path('home/', review.views.home, name='home'),
     path('signup', views.signup_page, name='signup'),
-    path('ticket/', review.views.ticket, name='ticket'),
+    path('ticket/', review.views.ticket_list, name='ticket_list'),
+    path('ticket/add/', review.views.ticket_create, name="ticket_create"),
+    path('ticket/<int:id>/update/', review.views.ticket_update, name="ticket_update"),
+    path('ticket/<int:id>/delete/', review.views.ticket_delete, name="ticket_delete"),
+
+
     path('review/', review.views.review, name='review'),
     path('user-follow/', review.views.user_follow, name='user_follow')
 ]

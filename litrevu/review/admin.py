@@ -2,7 +2,10 @@ from django.contrib import admin
 
 from review.models import Ticket
 
-admin.site.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'image')
+
+admin.site.register(Ticket, TicketAdmin)
 
 #autre technique via decorateur @admin.register(VPN)
 
