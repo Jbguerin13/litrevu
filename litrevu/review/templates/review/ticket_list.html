@@ -9,7 +9,8 @@
 <ul>
     {% for ticket in tickets %}
     <li>
-        <p>{{ ticket.title }}</p> <!--ajouter le lien <a> vers ticket_update-->
+        <p>{{ ticket.title }}</p>
+        <a href="{% url 'ticket_update ticket.id %}">[Modifier]</a>
     </li>
     {% endfor %}
 </ul>

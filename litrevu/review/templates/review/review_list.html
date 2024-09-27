@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Liste des critiques</h1>
+
+<a href="{% url 'review_create' %}">Ajouter une nouvelle critique</a>
+
+<ul>
+    {% for review in reviews %}
+    <li>
+        <p>{{ review.headline }}</p>         
+        <a href="{% url 'review_update review.id %}">[Modifier]</a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
