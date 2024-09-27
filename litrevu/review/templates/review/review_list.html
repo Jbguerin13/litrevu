@@ -10,7 +10,7 @@
     {% for review in reviews %}
     <li>
         <p>{{ review.headline }}</p>         
-        <a href="{% url 'review_update review.id %}">[Modifier]</a>
+        <a href="{% url 'review_update' review.id %}">[Modifier]</a>
     </li>
     {% endfor %}
 </ul>

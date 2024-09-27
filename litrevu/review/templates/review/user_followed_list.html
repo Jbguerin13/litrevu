@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Liste des Utilisateurs suivis</h1>
+
+<a href="{% url 'user_followed_create' %}">Suivre un nouvel utilisateur</a>
+
+<ul>
+    {% for user_followed in users_followed %}
+    <li>
+        <p>{{ user_followed.followed_user }}</p>         
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

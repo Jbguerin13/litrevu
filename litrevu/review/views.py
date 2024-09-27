@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from review.models import Ticket, Review, UserFollows
-from review.forms import TicketForm
-from review.forms import ReviewForm
+from review.forms import TicketForm, ReviewForm, UserFollowsForm
+
 
 @login_required
 def home(request):
@@ -51,7 +51,7 @@ def ticket_delete(request, id):
 def review_list(request):
     review = Review.objects.all()
     return render(request, 'review/review_list.html',
-                  {'review':review})
+                  {'reviews':review})
 
 def review_create(request):
     if request.method == "POST":
@@ -86,6 +86,25 @@ def review_delete(request, id):
     return render(request, "review/review_delete.html", {"review": review})
 
 
-def user_follow(request):
-    user_follow = UserFollows.objects.all()
-    return render(request, 'review/user_follow.html')
+def user_followed_list(request):
+    user_followed = UserFollows.objects.all()
+    return render(request, 'review/user_followed_list.html', {'users_followed':user_followed})
+
+def user_followed_create(request):
+    if request.method == "POST":
+        form = UserFollowsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("user_followed_list")
+    else:
+        form = UserFollowsForm()
+    return render(request, "review/user_followed_create.html", {"form": form})
+
+def user_followed_delete(request, id):
+    user_followed = UserFollows.objects.get(id=id)
+    
+    if request.method == "POST":
+        user_followed.delete()
+        return redirect("user_followed_list")
+    
+    return render(request, "review/user_followed_delete.html", {"user_followed": user_followed})
