@@ -69,4 +69,3 @@ def login_page(request):
         request, 'authentification/login.html', context={'form': form,
                                                          'message':message,}
     )
-    

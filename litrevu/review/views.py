@@ -20,8 +20,8 @@ def ticket_create(request):
         if form.is_valid():
             form.save()
             return redirect("ticket_list")
-    else:
-        form = TicketForm()
+        else:
+            form = TicketForm()
     return render(request, "review/ticket_create.html", {"form": form})
 
 
@@ -32,8 +32,8 @@ def ticket_update(request, id):
         if form.is_valid():
             form.save()
             return redirect("ticket_list")
-    else:
-        form = TicketForm(instance=ticket)
+        else:
+            form = TicketForm(instance=ticket)
     return render(request, "review/ticket_update.html", {"form": form})
 
 
