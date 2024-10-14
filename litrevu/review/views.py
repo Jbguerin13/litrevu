@@ -6,7 +6,8 @@ from review.forms import TicketForm, ReviewForm, UserFollowsForm
 
 @login_required
 def home(request):
-    return render(request, 'review/home.html')
+    tickets= Ticket.objects.all()
+    return render(request, 'review/home.html', context={'tickets': tickets})
 
 
 def ticket_list(request):
@@ -16,6 +17,7 @@ def ticket_list(request):
 
 
 def ticket_create(request):
+    form = TicketForm()
     if request.method == "POST":
         form = TicketForm(request.POST)
         if form.is_valid():
@@ -47,6 +49,17 @@ def ticket_delete(request, id):
     
     return render(request, "review/ticket_delete.html", {"ticket": ticket})
 
+def photo_upload(request):
+    form = TicketForm()
+    if request.method == "POST":
+        form = TicketForm(request.POST, request.FILES)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.uploader = request.user
+            ticket.save()
+            return redirect('home')
+    return render(request, 'review/photo_upload.html', context={'form': form})
+
 
 def review_list(request):
     review = Review.objects.all()
@@ -54,6 +67,7 @@ def review_list(request):
                   {'reviews':review})
 
 def review_create(request):
+    form = ReviewForm()
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -91,14 +105,15 @@ def user_followed_list(request):
     return render(request, 'review/user_followed_list.html', {'users_followed':user_followed})
 
 def user_followed_create(request):
+    form = UserFollowsForm(instance=request.user)
     if request.method == "POST":
-        form = UserFollowsForm(request.POST)
+        form = UserFollowsForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect("user_followed_list")
+            return redirect("home")
     else:
         form = UserFollowsForm()
-    return render(request, "review/user_followed_create.html", {"form": form})
+    return render(request, "review/user_followed_create.html", context={"form": form})
 
 def user_followed_delete(request, id):
     user_followed = UserFollows.objects.get(id=id)

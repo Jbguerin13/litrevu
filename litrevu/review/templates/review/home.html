@@ -2,4 +2,11 @@
 {% block content %}
     <h1>Page Home</h1>
     <p>Vous êtes connecté !</p>
+
+    <h2>Tickets</h2>
+    {% for ticket in tikets %}
+        <img src="{{ ticket.image.url }}">
+        <p>{{ ticket.caption }}</p>
+    {% endfor %}
+
 {% endblock content %}

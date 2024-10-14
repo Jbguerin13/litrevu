@@ -19,9 +19,12 @@ class Review(models.Model):
     headline = models.CharField(max_length=128)
     body = models.TextField(max_length=8192, blank=True)
     user = models.ForeignKey(
-        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
     time_created = models.DateTimeField(auto_now_add=True)
-
+    contributors = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, 
+        through='ReviewContributor', 
+        related_name='contributions')
 
 class UserFollows(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
@@ -32,3 +35,12 @@ class UserFollows(models.Model):
 
     def __str__(self):
         return f"{self.user.username} is following {self.followed_user.username}"
+
+
+class ReviewContributor(models.Model):
+    review =  models.ForeignKey(Review, on_delete=models.CASCADE)
+    contributor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    contributions = models.CharField(max_length=255, blank=True)
+    
+    class Meta:
+        unique_together = ('review', 'contributor')
