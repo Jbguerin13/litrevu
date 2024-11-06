@@ -2,16 +2,43 @@
 {% block title %} Onglet d'abonnements {% endblock title %}
 {% block content %}
 
-<h1>Liste des Utilisateurs suivis</h1>
+<h2>Suivre un nouvel utilisateur</h2>
 
-<a href="{% url 'user_followed_create' %}">Suivre un nouvel utilisateur</a>
+<a href="{% url 'user_followed_create' %}" style="
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;">
+    Suivre un nouvel utilisateur
+</a>
 
-<ul>
+<h2>Abonnés</h2>
+
+<table style="width:100%; border-collapse: collapse;">
+    <tr>
+        <th style="border: 1px solid black; padding: 8px;">Nom d'utilisateur</th>
+    </tr>
     {% for user_followed in users_followed %}
-    <li>
-        <p>{{ user_followed.followed_user }}</p>         
-    </li>
+    <tr>
+        <td style="border: 1px solid black; padding: 8px;">{{ user_followed.followed_user.username }}</td>
+    </tr>
     {% endfor %}
-</ul>
+</table>
+
+<h2>Mes abonnés</h2>
+<table style="width:100%; border-collapse: collapse;">
+    <tr>
+        <th style="border: 1px solid black; padding: 8px;">Nom d'utilisateur</th>
+    </tr>
+    {% for follower in followers %}
+    <tr>
+        <td style="border: 1px solid black; padding: 8px;">{{ follower.user.username }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}

@@ -39,13 +39,20 @@ class ReviewForm(forms.ModelForm):
 
 class UserFollowsForm(forms.ModelForm):
     """
-    A form for managing user follow relationships.
-    
-    Attributes:
-        model (User): The model associated with this form.
-        exclude (tuple): Fields to exclude from the form, specifically 'user'.
+    A form for selecting a user to follow.
     """
+    followed_user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="Nom de l'utilisateur à suivre"
+    )
+
     class Meta:
-        model = User
-        #fields = '__all__'
-        exclude = ('user',)
+        model = UserFollows
+        fields = ['followed_user']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Récupérer l'utilisateur actuel
+        super().__init__(*args, **kwargs)
+        if user:
+            # Exclure l'utilisateur actuel de la liste des choix
+            self.fields['followed_user'].queryset = User.objects.exclude(id=user.id)

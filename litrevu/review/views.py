@@ -269,27 +269,28 @@ def user_followed_list(request):
     Returns:
         HttpResponse: Renders the 'review/user_followed_list.html' template with all followed users.
     """
-    user_followed = UserFollows.objects.all()
-    return render(request, 'review/user_followed_list.html', {'users_followed':user_followed})
+    user = request.user
+    users_followed = UserFollows.objects.filter(user=user)
+    followers = UserFollows.objects.filter(followed_user=user)
+
+    return render(request, 'review/user_followed_list.html', {
+        'users_followed': users_followed,
+        'followers': followers,
+    })
 
 def user_followed_create(request):
     """
     View function to create a new user follow relationship.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'review/user_followed_create.html' template with the follow creation form.
     """
-    form = UserFollowsForm(instance=request.user)
     if request.method == "POST":
-        form = UserFollowsForm(request.POST, instance=request.user)
+        form = UserFollowsForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            user_follow = form.save(commit=False)  # Ne pas enregistrer immédiatement
+            user_follow.user = request.user  # Assigner l'utilisateur connecté
+            user_follow.save()
             return redirect("home")
     else:
-        form = UserFollowsForm()
+        form = UserFollowsForm(user=request.user)
     return render(request, "review/user_followed_create.html", context={"form": form})
 
 def user_followed_delete(request, id):
