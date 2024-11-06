@@ -1,12 +1,110 @@
 <html>
     <head>
-        <title>LITrevu</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+            .container {
+                width: 80%;
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid black;
+            }
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid black;
+                padding-bottom: 10px;
+            }
+            .header h1 {
+                margin: 0 auto;
+                text-align: center;
+            }
+            .content {
+                display: block;
+                justify-content: space-between;
+                align-items: center;
+                padding: 40px;
+                border-top: 1px solid black;
+            }
+            .box {
+                width: 45%;
+                text-align: center;
+                border: 1px solid black;
+                padding: 20px;
+            }
+            form {
+                max-width: 600px;
+                margin: auto;
+            }
+            fieldset {
+                margin-bottom: 20px;
+                padding: 20px;
+                border: 1px solid #ccc;
+            }
+            fieldset legend {
+                font-weight: bold;
+                padding: 0 10px;
+            }
+            fieldset div {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            fieldset label {
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            fieldset input[type="text"],
+            fieldset textarea,
+            fieldset input[type="file"] {
+                width: 100%;
+                padding: 8px;
+                box-sizing: border-box;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+            fieldset input[type="radio"] {
+                width: auto;
+                margin-right: 5px;
+            }
+            fieldset .rating-container {
+                display: flex;
+                gap: 10px;
+            }
+            input[type="submit"] {
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            input[type="submit"]:hover {
+                background-color: #45a049;
+            }
+        </style>
     </head>
     <body>
-        <h1>LITrevu</h1>
-        {% block content %}{% endblock content %}
-        {% if user.is_authenticated %}
-            <p>Vous êtes connecté en tant que {{ request.user }}. <a href="{% url 'logout' %}">Se déconnecter</a></p>
-        {% endif %}
+        <div class="container">
+            <div class="header">
+                <span id="page-title" style="font-size: 18px; text-align: center;">{% block title %}{% endblock title %}</span>
+            <div class="litreview">
+                <h1>LITReview</h1>
+            </div>
+                <span id="page-nav" style="font-size: 15px;">
+                    <a href="{% url 'flux' %}">Flux</a>
+                    <a href="{% url 'posts' %}">Posts</a>
+                    <a href="{% url 'user_followed_list' %}">Abonnements</a>
+                    <a href="{% url 'logout' %}">Se déconnecter</a>
+                </span>
+            </div>
+
+            <div class="content">
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
     </body>
 </html>

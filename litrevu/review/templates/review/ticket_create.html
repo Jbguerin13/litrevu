@@ -1,13 +1,31 @@
 {% extends 'base.html' %}
 
+{% block title %} Demander une critique {% endblock title %}
+
 {% block content %}
 
-<h1>Ajouter un ticket</h1>
+<h1>Créer un ticket</h1>
 
 <form action="" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Envoyer">
+
+    <fieldset>
+        <div>
+            <label for="ticket_title_id">Titre</label>
+            {{ form.title }}
+        </div>
+        <div>
+            <label for="ticket_description_id">Description</label>
+            {{ form.description }}
+        </div>
+        <div>
+            <label for="review_image_id">Image</label>
+            {{ form.image }}
+        </div>
+    </fieldset>
+    <div>
+        <input type="submit" value="Envoyer">
+    </div>
 </form>
 
 {% endblock %}

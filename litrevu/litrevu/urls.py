@@ -44,6 +44,8 @@ urlpatterns = [
     path('user-followed/add/', review.views.user_followed_create, name="user_followed_create"),
     path('user-followed/<int:id>/delete/', review.views.user_followed_delete, name="user_followed_delete"),
     path('photo/upload/', review.views.photo_upload, name="photo_upload"),
+    path('posts/', review.views.post_ticket_review, name="posts"),
+    path("flux/", review.views.flux, name="flux"),
 ]
 
 if settings.DEBUG:

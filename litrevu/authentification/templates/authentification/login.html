@@ -1,9 +1,41 @@
 {% extends 'base.html' %}
+{% block title %} Page d'accueil {% endblock title %}
 {% block content %}
-    <form method="post">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <button type="submit">Se connecter</button>
-        <p>Pas encore membre ? <a href="{% url 'signup' %}">Inscrivez-vous</a></p>
-    </form>
+    <!-- main div -->
+    <div style="display: flex; justify-content: center; align-items: flex-start; gap: 50px; margin-top: 50px;">
+
+        <!-- div Inscription -->
+        <div style="margin-left: 250px; flex: 1; max-width: 300px; text-align: center;">
+            <h2>Inscrivez-vous maintenant</h2>
+            <a href="{% url 'signup' %}">
+                <button style="padding: 10px 20px; font-size: 16px;">S'inscrire</button>
+            </a>
+        </div>
+
+        <!-- div Connexion -->
+        <div style="flex: 1; max-width: 300px; text-align: center;">
+            <h2>Connectez-vous</h2>
+            <form method="post" style="text-align: left;">
+                {% csrf_token %}
+                <!-- div textfield username -->
+                <div style="margin-left: 50px; margin-bottom: 15px;">
+                    <label for="id_username" style="display: block;">Nom d'utilisateur</label>
+                    {{ form.username }}
+                </div>
+                <!-- div textfield password -->
+                <div style="margin-bottom: 15px; margin-left: 50px;">
+                    <label for="id_password" style="display: block;">Mot de passe</label>
+                    {{ form.password }}
+                </div>
+                <!-- div button submit -->
+                <div style="text-align: center;">
+                    <button type="submit" style="padding: 10px 20px; font-size: 16px;">Se connecter</button>
+                </div>
+            </form>
+
+            {% if message %}
+                <p style="color: red; text-align: center;">{{ message }}</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock content %}

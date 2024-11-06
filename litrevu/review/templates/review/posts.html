@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Vos posts {% endblock title %}
+
+{% block content %}
+    <div class="posts-page base-page">
+        <div class="icone-title">
+            <img src="{% static 'icones/icone-post.webp' %}" alt="icone critique">
+            <h2>Vos posts</h2>
+        </div>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% for post in posts %}
+            {% if post.ticket %}
+                <div class="post-review">
+                    <div class="title-date">
+                        <div class="post-icone">
+                            <div class="post-icone-title">
+                                <img src="{% static 'icones/icone-review.webp' %}" alt="icone critique">
+                                Vous avez publié une critique
+                            </div>
+                        </div>
+                        {{ post.time_created }}
+                    </div>
+                    <div>
+                        <div class="star-rating">
+                            <span>{{ post.headline }}</span>
+                            <span class='stars'>
+                                {% for star in "x"|rjust:post.rating %}
+                                    <img src="{% static 'icones/icone-etoile.webp' %}" alt="icone etoile">
+                                {% endfor %}
+                            </span>
+                        </div>
+                        <p class="text-description">{{ post.body }}</p>
+                    </div>
+                    <div class="post-ticket-review">
+                        <div class="post-icone">
+                            <div class="post-icone-title">
+                                <img src="{% static 'icones/icone-ticket.webp' %}" alt="icone critique">
+                                <span>Ticket - <strong>{{ post.ticket.user }}</strong></span>
+                            </div>
+                            <span>{{ post.ticket.time_created }}</span>
+                        </div>
+                        <p><strong>{{ post.ticket.title }}</strong></p>
+                        <p class="text-description">{{ post.ticket.description }}</p>
+                        <img src="{{ post.ticket.image.url }}" alt="{{post.ticket.title}}">
+                    </div>
+                    <div class="connexion-button button-submit-right">
+                        <a href="{% url 'edit_review' post.id %}" class="submit-button">Modifier</a>
+                        <a href="{% url 'delete_review' post.id %}" class="submit-button">Supprimer</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="post-ticket">
+                    <div class="title-date">
+                        <div class="post-icone">
+                            <div class="post-icone-title">
+                                <img src="{% static 'icones/icone-ticket.webp' %}" alt="icone critique">
+                                Vous avez publié un ticket
+                            </div>
+                        </div>
+                        {{ post.time_created }}
+                    </div>
+                    <p><strong>{{ post.title }}</strong></p>
+                    <p class="text-description">{{ post.description }}</p>
+                    <img src="{{ post.image.url }}" alt="{{post.title}}">
+                    <div class="connexion-button button-submit-right">
+                        {% if not post.has_review %}
+                            <a href="{% url 'edit_ticket' post.id %}" class="submit-button">Modifier</a>
+                        {% endif %}
+                        <a href="{% url 'delete_ticket' post.id %}" class="submit-button">Supprimer</a>
+                    </div>
+                </div>
+
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+{% endblock content %}
