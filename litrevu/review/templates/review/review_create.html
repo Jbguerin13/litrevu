@@ -3,48 +3,51 @@
 {% block title %} Créer une critique {% endblock title %}
 
 {% block content %}
-<h1>Créer une critique</h1>
 
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+<div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <h1>Créer une critique</h1>
 
-    <fieldset>
-        <legend>Livre / Article</legend>
-        <div>
-            <label for="review_title_id">Titre</label>
-            <input type="text" id="review_title_id" name="review_title" maxlength="128" required>
-        </div>
-        <div>
-            <label for="review_description_id">Description</label>
-            <textarea id="review_description_id" name="review_description" rows="4"></textarea>
-        </div>
-        <div>
-            <label for="review_image_id">Image</label>
-            <input type="file" id="review_image_id" name="review_image">
-        </div>
-    </fieldset>
+    <form action="" method="post" enctype="multipart/form-data" style="width: 100%; margin: 0;">
+        {% csrf_token %}
 
-    <fieldset>
-        <legend>Critique</legend>
-        <div>
-            <label for="reviewn_headline_id">Titre</label>
-            <input type="text" id="reviewn_headline_id" name="headline_id" maxlength="128" required>
-        </div>
-        <div id="note-rating" class="rating-container" style="display: inline-block;">
-            <label>Note</label>
-            {% for i in "012345" %}
-                <input type="radio" id="id_rating_{{ i }}" name="rating" value="{{ i }}">
-                <label for="id_rating_{{ i }}">{{ i }}</label>
-            {% endfor %}
-        </div>
-        <div>
-            <label for="review_body_id">Commentaire</label>
-            <textarea id="review_body_id" name="review_body" rows="4"></textarea>
-        </div>
-    </fieldset>
+        <fieldset>
+            <legend>Livre / Article</legend>
+            <div>
+                <label for="review_title_id">Titre</label>
+                <input type="text" id="review_title_id" name="review_title" maxlength="128" required>
+            </div>
+            <div>
+                <label for="review_description_id">Description</label>
+                <textarea id="review_description_id" name="review_description" rows="4"></textarea>
+            </div>
+            <div>
+                <label for="review_image_id">Image</label>
+                <input type="file" id="review_image_id" name="review_image">
+            </div>
+        </fieldset>
 
-    <div>
-        <input type="submit" value="Envoyer">
-    </div>
-</form>
+        <fieldset>
+            <legend>Critique</legend>
+            <div>
+                <label for="reviewn_headline_id">Titre</label>
+                <input type="text" id="reviewn_headline_id" name="headline_id" maxlength="128" required>
+            </div>
+            <div id="note-rating" class="rating-container" style="display: inline-block;">
+                <label>Note</label>
+                {% for i in "012345" %}
+                    <input type="radio" id="id_rating_{{ i }}" name="rating" value="{{ i }}">
+                    <label for="id_rating_{{ i }}">{{ i }}</label>
+                {% endfor %}
+            </div>
+            <div>
+                <label for="review_body_id">Commentaire</label>
+                <textarea id="review_body_id" name="review_body" rows="4"></textarea>
+            </div>
+        </fieldset>
+
+        <div>
+            <input type="submit" value="Envoyer">
+        </div>
+    </form>
+</div>
 {% endblock %}

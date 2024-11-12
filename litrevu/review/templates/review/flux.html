@@ -1,95 +1,139 @@
 {% extends 'base.html' %}
-{% load static%}
+{% load static %}
 {% block title %} Flux {% endblock title %}
-{% block content %}
-    <div class="flux-page base-page">
-        <div class="icone-title">
-            <img src="{% static 'icones/icone-flux.webp' %}" alt="icone flux">
-            <h2>Flux</h2>
-        </div>
-        <div class="connexion-button">
-            <a href="{% url 'ticket_create' %}" class="submit-button">Demander une critique</a>
-            <a href="{% url 'review_create' %}" class="submit-button">Créer une critique</a>
-        </div>
 
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% for post in posts %}
-            {% if post.ticket %}
-                <div class="post-review">
-                    <div class="title-date">
-                        <div class="post-icone">
-                            <div class="post-icone-title">
-                                <img src="{% static 'icones/icone-review.webp' %}" alt="icone critique">
-                                {% if post.user != request.user %}
-                                    {{ post.user }} a
-                                {% else %}
-                                    Vous avez
-                                {% endif %}
-                                publié une critique
-                            </div>
-                        </div>
-                        {{ post.time_created }}
-                    </div>
-                    <div>
-                        <div class="star-rating">
-                            <span>{{ post.headline }}</span>
-                            <span class='stars'>
-                                {% for star in "x"|rjust:post.rating %}
-                                    <img src="{% static 'icones/icone-etoile.webp' %}" alt="icone etoile">
-                                {% endfor %}
-                            </span>
-                        </div>
-                        <p class="text-description">{{ post.body }}</p>
-                    </div>
-                    <div class="post-ticket-review">
-                        <div class="post-icone">
-                            <div class="post-icone-title">
-                                <img src="{% static 'icones/icone-ticket.webp' %}" alt="icone critique">
-                                {% if post.ticket.user != request.user %}
-                                    <strong>Ticket - {{ post.ticket.user }}</strong>
-                                {% else %}
-                                    <strong>Votre Ticket</strong>
-                                {% endif %}
-                            </div>
-                            <span>{{ post.ticket.time_created }}</span>
-                        </div>
-                        <p><strong>{{ post.ticket.title }}</strong></p>
-                        <p class="text-description">{{ post.ticket.description }}</p>
-                        <img src="{{ post.ticket.image.url }}" alt="{{post.ticket.title}}">
-                    </div>
+{% block content %}
+<style>
+    .styled-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+    .styled-button:hover {
+        background-color: #45a049;
+    }
+
+    .post-container {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .post-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .post-date {
+        font-size: 0.9em;
+        color: #666;
+    }
+
+    .post-content, .ticket-content {
+        margin-top: 10px;
+    }
+
+    .ticket-content img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .stars img {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+
+<div class="flux-page base-page">
+    <div class="icone-title">
+        <img src="{% static 'icones/icone-flux.webp' %}" alt="icone flux">
+        <h2>Flux</h2>
+    </div>
+
+    <div class="connexion-button">
+        <a href="{% url 'ticket_create' %}" class="styled-button">Demander une critique</a>
+        <a href="{% url 'review_create' %}" class="styled-button">Créer une critique</a>
+    </div>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% for post in posts %}
+        <div class="post-container">
+            <div class="post-header">
+                <div class="post-info">
+                    <img src="{% static 'icones/icone-review.webp' %}" alt="icone critique">
+                    <strong>
+                        {% if post.user != request.user %}
+                            {{ post.user }} a
+                        {% else %}
+                            Vous avez
+                        {% endif %}
+                        {% if post.ticket %}
+                            publié une critique
+                        {% else %}
+                            demandé une critique
+                        {% endif %}
+                    </strong>
+                    <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
                 </div>
-            {% else %}
-                <div class="post-ticket">
-                    <div class="title-date">
-                        <div class="post-icone">
-                            <div class="post-icone-title">
-                                <img src="{% static 'icones/icone-ticket.webp' %}" alt="icone critique">
-                                {% if post.user != request.user %}
-                                    {{ post.user }} a
-                                {% else %}
-                                    Vous avez
-                                {% endif %}
-                                publié un ticket
-                            </div>
-                        </div>
-                        {{ post.time_created }}
-                    </div>
-                    <p><strong>{{ post.title }}</strong></p>
-                    <p class="text-description">{{ post.description }}</p>
-                    <img src="{{ post.image.url }}" alt="{{post.title}}">
-                    {% if not post.has_review %}
-                        <div class="connexion-button button-submit-right">
-                            <a href="{% url 'create_review_ticket' post.id %}" class="submit-button">Répondre</a>
-                        </div>
+            </div>
+
+            {% if post.ticket %}
+                <div class="post-content">
+                    <p><strong>{{ post.headline }}</strong> - 
+                    <span class='stars'>
+                        {% for star in "x"|rjust:post.rating %}
+                            <img src="{% static 'icones/icone-etoile.webp' %}" alt="icone etoile">
+                        {% endfor %}
+                    </span></p>
+                    <p class="text-description">{{ post.body }}</p>
+                </div>
+
+                <div class="ticket-content">
+                    <p><strong>Ticket - {{ post.ticket.user }}</strong></p>
+                    <p>{{ post.ticket.title }}</p>
+                    <p class="text-description">{{ post.ticket.description }}</p>
+                    {% if post.ticket.image %}
+                        <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
                     {% endif %}
                 </div>
+            {% else %}
+                <div class="ticket-content">
+                    <p><strong>{{ post.title }}</strong></p>
+                    <p class="text-description">{{ post.description }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+                </div>
+                {% if not post.has_review %}
+                    <a href="{% url 'create_review_ticket' post.id %}" class="styled-button">Créer une critique</a>
+                {% endif %}
             {% endif %}
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+</div>
 {% endblock content %}

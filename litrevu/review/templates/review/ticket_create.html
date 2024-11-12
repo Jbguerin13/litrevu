@@ -4,28 +4,29 @@
 
 {% block content %}
 
-<h1>Créer un ticket</h1>
+<div style="display: flex; flex-direction: column; align-items: center;">
+    <h1>Créer un ticket</h1>
+    <form action="" method="post">
+        {% csrf_token %}
 
-<form action="" method="post">
-    {% csrf_token %}
-
-    <fieldset>
+        <fieldset>
+            <div>
+                <label for="ticket_title_id">Titre</label>
+                {{ form.title }}
+            </div>
+            <div>
+                <label for="ticket_description_id">Description</label>
+                {{ form.description }}
+            </div>
+            <div>
+                <label for="review_image_id">Image</label>
+                {{ form.image }}
+            </div>
+        </fieldset>
         <div>
-            <label for="ticket_title_id">Titre</label>
-            {{ form.title }}
+            <input type="submit" value="Envoyer">
         </div>
-        <div>
-            <label for="ticket_description_id">Description</label>
-            {{ form.description }}
-        </div>
-        <div>
-            <label for="review_image_id">Image</label>
-            {{ form.image }}
-        </div>
-    </fieldset>
-    <div>
-        <input type="submit" value="Envoyer">
-    </div>
-</form>
+    </form>
+</div>
 
 {% endblock %}
