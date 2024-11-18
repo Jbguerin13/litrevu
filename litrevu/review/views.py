@@ -94,7 +94,7 @@ def ticket_list(request):
                   {'tickets':tickets})
 
 
-def ticket_create(request):
+def ticket_create(request): 
     """
     View function to create a new ticket.
 
@@ -106,9 +106,11 @@ def ticket_create(request):
     """
     form = TicketForm()
     if request.method == "POST":
-        form = TicketForm(request.POST)
+        form = TicketForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
             return redirect("ticket_list")
         else:
             form = TicketForm()
@@ -127,14 +129,14 @@ def ticket_update(request, id):
         HttpResponse: Renders the 'review/ticket_update.html' template with the update form.
     """
     ticket = Ticket.objects.get(id=id)
+    form = TicketForm(instance=ticket)
+    
     if request.method == "POST":
-        form = TicketForm(request.POST, instance=ticket)
+        form = TicketForm(request.POST, request.FILES, instance=ticket)
         if form.is_valid():
             form.save()
-            return redirect("ticket_list")
-        else:
-            form = TicketForm(instance=ticket)
-    return render(request, "review/ticket_update.html", {"form": form})
+            return redirect("flux")
+    return render(request, "review/ticket_update.html", {"form": form, "ticket": ticket})
 
 
 def ticket_delete(request, id):

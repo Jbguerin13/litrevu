@@ -82,58 +82,28 @@
     {% endif %}
 
     {% for post in posts %}
-        <div class="post-container">
-            <div class="post-header">
-                <div class="post-info">
-                    <img src="{% static 'icones/icone-review.webp' %}" alt="icone critique">
-                    <strong>
-                        {% if post.user != request.user %}
-                            {{ post.user }} a
-                        {% else %}
-                            Vous avez
-                        {% endif %}
-                        {% if post.ticket %}
-                            publié une critique
-                        {% else %}
-                            demandé une critique
-                        {% endif %}
-                    </strong>
-                    <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
-                </div>
+    <div class="post-container">
+        <div class="post-header">
+            <div class="post-info">
+                <strong>
+                    {% if post.user != request.user %}
+                        {{ post.user }} a publié un ticket
+                    {% else %}
+                        Vous avez publié un ticket
+                    {% endif %}
+                </strong>
+                <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
             </div>
-
-            {% if post.ticket %}
-                <div class="post-content">
-                    <p><strong>{{ post.headline }}</strong> - 
-                    <span class='stars'>
-                        {% for star in "x"|rjust:post.rating %}
-                            <img src="{% static 'icones/icone-etoile.webp' %}" alt="icone etoile">
-                        {% endfor %}
-                    </span></p>
-                    <p class="text-description">{{ post.body }}</p>
-                </div>
-
-                <div class="ticket-content">
-                    <p><strong>Ticket - {{ post.ticket.user }}</strong></p>
-                    <p>{{ post.ticket.title }}</p>
-                    <p class="text-description">{{ post.ticket.description }}</p>
-                    {% if post.ticket.image %}
-                        <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
-                    {% endif %}
-                </div>
-            {% else %}
-                <div class="ticket-content">
-                    <p><strong>{{ post.title }}</strong></p>
-                    <p class="text-description">{{ post.description }}</p>
-                    {% if post.image %}
-                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
-                    {% endif %}
-                </div>
-                {% if not post.has_review %}
-                    <a href="{% url 'create_review_ticket' post.id %}" class="styled-button">Créer une critique</a>
-                {% endif %}
-            {% endif %}
         </div>
-    {% endfor %}
-</div>
+
+        <div class="ticket-content">
+            <p><strong>{{ post.title }}</strong></p>
+            <p class="text-description">{{ post.description }}</p>
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            {% endif %}
+            <a href="{% url 'ticket_update' post.id %}" class="styled-button">Voir / Modifier</a>
+        </div>
+    </div>
+{% endfor %}
 {% endblock content %}

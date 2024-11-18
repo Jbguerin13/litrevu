@@ -1,11 +1,17 @@
 from django.contrib import admin
 
-from review.models import Ticket
+from review.models import Ticket, Review
 
 class TicketAdmin(admin.ModelAdmin):
     list_display = ('title', 'description', 'image')
+    search_fields = ["title",]
+    #list_filter = ["is_default"]
 
 admin.site.register(Ticket, TicketAdmin)
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('rating', 'user', 'body')
 
 #autre technique via decorateur @admin.register(VPN)
 
