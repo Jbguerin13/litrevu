@@ -6,31 +6,32 @@
 
 <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
     <h1>Créer une critique</h1>
-
     <form action="" method="post" enctype="multipart/form-data" style="width: 100%; margin: 0;">
         {% csrf_token %}
-
+    
+        <!-- Section pour le ticket (livre/article) -->
         <fieldset>
             <legend>Livre / Article</legend>
             <div>
-                <label for="review_title_id">Titre</label>
-                <input type="text" id="review_title_id" name="review_title" maxlength="128" required>
+                <label for="id_ticket_title">Titre</label>
+                <input type="text" id="id_ticket_title" name="ticket_title" maxlength="128" required>
             </div>
             <div>
-                <label for="review_description_id">Description</label>
-                <textarea id="review_description_id" name="review_description" rows="4"></textarea>
+                <label for="id_ticket_description">Description</label>
+                <textarea id="id_ticket_description" name="ticket_description" rows="4"></textarea>
             </div>
             <div>
-                <label for="review_image_id">Image</label>
-                <input type="file" id="review_image_id" name="review_image">
+                <label for="id_ticket_image">Image</label>
+                <input type="file" id="id_ticket_image" name="ticket_image">
             </div>
         </fieldset>
-
+    
+        <!-- Section pour la critique -->
         <fieldset>
             <legend>Critique</legend>
             <div>
-                <label for="reviewn_headline_id">Titre</label>
-                <input type="text" id="reviewn_headline_id" name="headline_id" maxlength="128" required>
+                <label for="id_headline">Titre</label>
+                <input type="text" id="id_headline" name="headline" maxlength="128" required>
             </div>
             <div id="note-rating" class="rating-container" style="display: inline-block;">
                 <label>Note</label>
@@ -40,11 +41,11 @@
                 {% endfor %}
             </div>
             <div>
-                <label for="review_body_id">Commentaire</label>
-                <textarea id="review_body_id" name="review_body" rows="4"></textarea>
+                <label for="id_body">Commentaire</label>
+                <textarea id="id_body" name="body" rows="4"></textarea>
             </div>
         </fieldset>
-
+    
         <div>
             <input type="submit" value="Envoyer">
         </div>

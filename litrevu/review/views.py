@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from review.models import Ticket, Review, UserFollows
 from review.forms import TicketForm, ReviewForm, UserFollowsForm
@@ -34,6 +35,7 @@ def post_ticket_review(request):
     reviews = Review.objects.filter(user=request.user)
     posts = list(tickets) + list(reviews)
 
+    # Tri des posts par date de création
     posts.sort(key=lambda x: x.time_created, reverse=True)
 
     context = {
@@ -199,22 +201,42 @@ def review_list(request):
 def review_create(request):
     """
     View function to create a new review.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'review/review_create.html' template with the review creation form.
     """
-    form = ReviewForm()
     if request.method == "POST":
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            form.save()
+        # Récupération des données POST pour la critique
+        ticket_title = request.POST.get("ticket_title")
+        ticket_description = request.POST.get("ticket_description")
+        ticket_image = request.FILES.get("ticket_image")
+
+        headline = request.POST.get("headline")
+        body = request.POST.get("body")
+        rating = request.POST.get("rating")
+
+        if ticket_title and headline and rating is not None:
+            # Créer un ticket associé si nécessaire
+            ticket = Ticket.objects.create(
+                title=ticket_title,
+                description=ticket_description,
+                image=ticket_image,
+                user=request.user
+            )
+
+            # Créer la critique associée au ticket
+            review = Review.objects.create(
+                ticket=ticket,
+                headline=headline,
+                body=body,
+                rating=rating,
+                user=request.user
+            )
+
+            # Ajouter un message de confirmation
+            messages.success(request, "Votre critique a été créée avec succès !")
             return redirect("review_list")
         else:
-            form = ReviewForm()
-    return render(request, "review/review_create.html", {"form": form})
+            messages.error(request, "Tous les champs obligatoires doivent être remplis.")
+
+    return render(request, "review/review_create.html")
 
 
 def review_update(request, id):
