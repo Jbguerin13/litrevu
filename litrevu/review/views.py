@@ -29,13 +29,12 @@ def post_ticket_review(request):
         request: The HTTP request object.
 
     Returns:
-        HttpResponse: Renders the 'bookreview/posts.html' template with the user's posts.
+        HttpResponse: Renders the 'bookrevixew/posts.html' template with the user's posts.
     """
     tickets = Ticket.objects.filter(user=request.user)
     reviews = Review.objects.filter(user=request.user)
     posts = list(tickets) + list(reviews)
 
-    # Tri des posts par date de création
     posts.sort(key=lambda x: x.time_created, reverse=True)
 
     context = {
@@ -47,37 +46,31 @@ def post_ticket_review(request):
 @login_required
 def flux(request):
     """
-    View function to display the feed of tickets and reviews for the user, including 
-    those from followed users.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'bookreview/flux.html' template with the user's feed.
+    Vue pour afficher le flux des tickets et critiques des utilisateurs que vous suivez.
     """
-    tickets = Ticket.objects.filter(user=request.user)
-    reviews = Review.objects.filter(user=request.user)
+    # Récupérer les utilisateurs suivis par l'utilisateur connecté
+    followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
 
-    posts_set = set(tickets) | set(reviews)
+    # Tickets des utilisateurs suivis
+    tickets = Ticket.objects.filter(user__in=followed_users)
 
-    follows = UserFollows.objects.filter(user=request.user)
+    # Critiques des utilisateurs suivis
+    reviews = Review.objects.filter(user__in=followed_users)
 
-    for follow in follows:
-        tickets_followed = Ticket.objects.filter(user=follow.followed_user)
-        reviews_followed = Review.objects.filter(user=follow.followed_user)
-        posts_set |= set(tickets_followed) | set(reviews_followed)
-
-    user_reviews = Review.objects.filter(ticket__user=request.user)
-    posts_set |= set(user_reviews)
-
-    posts = sorted(posts_set, key=lambda x: x.time_created, reverse=True)
+    # Combinaison et tri
+    posts = sorted(
+        list(tickets) + list(reviews),
+        key=lambda x: x.time_created,
+        reverse=True
+    )
 
     context = {
         "posts": posts,
     }
-
     return render(request, "review/flux.html", context)
+
+
+
 
 # =========== Ticket ===========
 
@@ -198,45 +191,32 @@ def review_list(request):
     return render(request, 'review/review_list.html',
                   {'reviews':review})
 
+@login_required
 def review_create(request):
     """
-    View function to create a new review.
+    View to create a new review, optionally linked to an existing ticket.
     """
+    ticket_id = request.GET.get('ticket')
+    ticket = None
+
+    if ticket_id:
+        try:
+            ticket = Ticket.objects.get(id=ticket_id)
+        except Ticket.DoesNotExist:
+            ticket = None
+
     if request.method == "POST":
-        # Récupération des données POST pour la critique
-        ticket_title = request.POST.get("ticket_title")
-        ticket_description = request.POST.get("ticket_description")
-        ticket_image = request.FILES.get("ticket_image")
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.ticket = ticket  # Associer au ticket si présent
+            review.save()
+            return redirect("flux")
+    else:
+        form = ReviewForm()
 
-        headline = request.POST.get("headline")
-        body = request.POST.get("body")
-        rating = request.POST.get("rating")
-
-        if ticket_title and headline and rating is not None:
-            # Créer un ticket associé si nécessaire
-            ticket = Ticket.objects.create(
-                title=ticket_title,
-                description=ticket_description,
-                image=ticket_image,
-                user=request.user
-            )
-
-            # Créer la critique associée au ticket
-            review = Review.objects.create(
-                ticket=ticket,
-                headline=headline,
-                body=body,
-                rating=rating,
-                user=request.user
-            )
-
-            # Ajouter un message de confirmation
-            messages.success(request, "Votre critique a été créée avec succès !")
-            return redirect("review_list")
-        else:
-            messages.error(request, "Tous les champs obligatoires doivent être remplis.")
-
-    return render(request, "review/review_create.html")
+    return render(request, "review/review_create.html", {"form": form, "ticket": ticket})
 
 
 def review_update(request, id):

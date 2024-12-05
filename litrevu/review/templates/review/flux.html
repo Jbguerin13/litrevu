@@ -68,7 +68,6 @@
 
     <div class="connexion-button">
         <a href="{% url 'ticket_create' %}" class="styled-button">Demander une critique</a>
-        <a href="{% url 'review_create' %}" class="styled-button">Créer une critique</a>
     </div>
 
     {% if messages %}
@@ -80,28 +79,51 @@
     {% endif %}
 
     {% for post in posts %}
-    <div class="post-container">
-        <div class="post-header">
-            <div class="post-info">
-                <strong>
-                    {% if post.user != request.user %}
-                        {{ post.user }} a publié un ticket
-                    {% else %}
-                        Vous avez publié un ticket
-                    {% endif %}
-                </strong>
-                <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+        <div class="post-container">
+            <div class="post-header">
+                <div class="post-info">
+                    <strong>
+                        {% if post.ticket %}
+                            {{ post.user }} a publié une critique
+                        {% else %}
+                            {{ post.user }} a publié un ticket
+                        {% endif %}
+                    </strong>
+                    <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+                </div>
             </div>
-        </div>
 
-        <div class="ticket-content">
-            <p><strong>{{ post.title }}</strong></p>
-            <p class="text-description">{{ post.description }}</p>
-            {% if post.image %}
-                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            {% if post.ticket %}
+                <!-- Critique -->
+                <div class="post-content">
+                    <p><strong>{{ post.headline }}</strong></p>
+                    <span class='stars'>
+                        {% for star in "x"|rjust:post.rating %}
+                            ★
+                        {% endfor %}
+                    </span>
+                    <p>{{ post.body }}</p>
+                </div>
+                <!-- Ticket associé -->
+                <div class="ticket-content">
+                    <p><strong>Ticket lié :</strong> {{ post.ticket.title }}</p>
+                    <p>{{ post.ticket.description }}</p>
+                    {% if post.ticket.image %}
+                        <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
+                    {% endif %}
+                </div>
+            {% else %}
+                <!-- Ticket -->
+                <div class="ticket-content">
+                    <p><strong>{{ post.title }}</strong></p>
+                    <p class="text-description">{{ post.description }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+                    <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
+                </div>
             {% endif %}
-            <a href="{% url 'ticket_update' post.id %}" class="styled-button">Voir / Modifier</a>
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>
 {% endblock content %}
