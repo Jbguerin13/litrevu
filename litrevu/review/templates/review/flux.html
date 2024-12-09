@@ -115,7 +115,6 @@
                 </div>
             </div>
         {% else %}
-            <!-- Ticket -->
             <div class="post-container">
                 <div class="post-header">
                     <div class="post-info">
@@ -130,7 +129,7 @@
                         <img src="{{ post.image.url }}" alt="{{ post.title }}">
                     {% endif %}
                     
-                    <!-- Ajout du message pour indiquer l'état de la critique -->
+                    <!-- Add log to indicate the review state -->
                     {% if not post.has_review %}
                         <p class="status-message">Vous n'avez pas encore répondu à ce ticket.</p>
                         <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>

@@ -76,7 +76,7 @@
 
     {% for post in posts %}
         {% if post.ticket %}
-            <!-- Critique -->
+            <!-- Review -->
             <div class="post-container">
                 <div class="post-header">
                     <div class="post-info">
@@ -93,7 +93,7 @@
                     </span>
                     <p>{{ post.body }}</p>
                 </div>
-                <!-- Ticket associé -->
+                <!-- Tickets associat -->
                 <div class="ticket-content">
                     <p><strong>Ticket lié :</strong> {{ post.ticket.title }}</p>
                     <p>{{ post.ticket.description }}</p>
