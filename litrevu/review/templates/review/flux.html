@@ -79,22 +79,15 @@
     {% endif %}
 
     {% for post in posts %}
-        <div class="post-container">
-            <div class="post-header">
-                <div class="post-info">
-                    <strong>
-                        {% if post.ticket %}
-                            {{ post.user }} a publié une critique
-                        {% else %}
-                            {{ post.user }} a publié un ticket
-                        {% endif %}
-                    </strong>
-                    <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+        {% if post.ticket %}
+            <!-- Critique -->
+            <div class="post-container">
+                <div class="post-header">
+                    <div class="post-info">
+                        <strong>{{ post.user }} a publié une critique</strong>
+                        <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+                    </div>
                 </div>
-            </div>
-
-            {% if post.ticket %}
-                <!-- Critique -->
                 <div class="post-content">
                     <p><strong>{{ post.headline }}</strong></p>
                     <span class='stars'>
@@ -112,18 +105,40 @@
                         <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
                     {% endif %}
                 </div>
-            {% else %}
-                <!-- Ticket -->
+            </div>
+        {% else %}
+            <!-- Ticket -->
+            <div class="post-container">
+                <div class="post-header">
+                    <div class="post-info">
+                        <strong>{{ post.user }} a publié un ticket</strong>
+                        <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+                    </div>
+                </div>
                 <div class="ticket-content">
                     <p><strong>{{ post.title }}</strong></p>
                     <p class="text-description">{{ post.description }}</p>
                     {% if post.image %}
                         <img src="{{ post.image.url }}" alt="{{ post.title }}">
                     {% endif %}
-                    <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
+                    {% if not post.has_review %}
+                        <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
+                    {% else %}
+                        <!-- Affichage de la critique associée -->
+                        <div class="post-content">
+                            <strong>Critique associée :</strong>
+                            <p><strong>{{ post.review_set.first.headline }}</strong></p>
+                            <span class='stars'>
+                                {% for star in "x"|rjust:post.review_set.first.rating %}
+                                    ★
+                                {% endfor %}
+                            </span>
+                            <p>{{ post.review_set.first.body }}</p>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
     {% endfor %}
 </div>
 {% endblock content %}

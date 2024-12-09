@@ -33,8 +33,7 @@ class ReviewForm(forms.ModelForm):
     """
     class Meta:
         model = Review
-        #fields = '__all__'
-        exclude = ('user', 'time_created', 'ticket')
+        exclude = ('user', 'time_created', 'ticket', 'contributors')  # Exclure les champs gérés automatiquement
         
 
 class UserFollowsForm(forms.ModelForm):

@@ -61,7 +61,8 @@ class Review(models.Model):
     contributors = models.ManyToManyField(
         settings.AUTH_USER_MODEL, 
         through='ReviewContributor', 
-        related_name='contributions')
+        related_name='contributions',
+        blank=True,)
     
     def __str__(self):
         """

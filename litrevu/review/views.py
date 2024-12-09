@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from review.models import Ticket, Review, UserFollows
 from review.forms import TicketForm, ReviewForm, UserFollowsForm
+from django.shortcuts import get_object_or_404
 
 # =========== Home and User Flux ===========
 
@@ -24,17 +25,12 @@ def home(request):
 def post_ticket_review(request):
     """
     View function to display tickets and reviews created by the current user.
-
-    Args:
-        request: The HTTP request object.
-
-    Returns:
-        HttpResponse: Renders the 'bookrevixew/posts.html' template with the user's posts.
     """
     tickets = Ticket.objects.filter(user=request.user)
     reviews = Review.objects.filter(user=request.user)
     posts = list(tickets) + list(reviews)
 
+    # Tri des posts par date de création
     posts.sort(key=lambda x: x.time_created, reverse=True)
 
     context = {
@@ -43,21 +39,23 @@ def post_ticket_review(request):
 
     return render(request, "review/posts.html", context)
 
+
 @login_required
 def flux(request):
     """
-    Vue pour afficher le flux des tickets et critiques des utilisateurs que vous suivez.
+    View function to display the feed of tickets and reviews for the user, including
+    those from followed users.
     """
-    # Récupérer les utilisateurs suivis par l'utilisateur connecté
-    followed_users = UserFollows.objects.filter(user=request.user).values_list('followed_user', flat=True)
+    # Récupère les utilisateurs suivis
+    followed_users = UserFollows.objects.filter(user=request.user).values_list("followed_user", flat=True)
 
     # Tickets des utilisateurs suivis
     tickets = Ticket.objects.filter(user__in=followed_users)
 
-    # Critiques des utilisateurs suivis
-    reviews = Review.objects.filter(user__in=followed_users)
+    # Critiques associées aux tickets des utilisateurs suivis
+    reviews = Review.objects.filter(ticket__in=tickets)
 
-    # Combinaison et tri
+    # Combinez les tickets et critiques pour un affichage groupé
     posts = sorted(
         list(tickets) + list(reviews),
         key=lambda x: x.time_created,
@@ -112,26 +110,44 @@ def ticket_create(request):
     return render(request, "review/ticket_create.html", {"form": form})
 
 
+@login_required
 def ticket_update(request, id):
     """
-    View function to update an existing ticket.
-
-    Args:
-        request: The HTTP request object.
-        id (int): The ID of the ticket to be updated.
-
-    Returns:
-        HttpResponse: Renders the 'review/ticket_update.html' template with the update form.
+    View function to allow responding to an existing ticket.
     """
-    ticket = Ticket.objects.get(id=id)
+    try:
+        ticket = Ticket.objects.get(id=id)
+    except Ticket.DoesNotExist:
+        messages.error(request, "Ce ticket n'existe pas.")
+        return redirect("flux")
+
+    # Si l'utilisateur n'est pas le créateur, il peut uniquement répondre (pas modifier)
+    can_edit = ticket.user == request.user
+
     form = TicketForm(instance=ticket)
-    
+
     if request.method == "POST":
-        form = TicketForm(request.POST, request.FILES, instance=ticket)
-        if form.is_valid():
-            form.save()
-            return redirect("flux")
-    return render(request, "review/ticket_update.html", {"form": form, "ticket": ticket})
+        if can_edit:
+            form = TicketForm(request.POST, request.FILES, instance=ticket)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Ticket mis à jour avec succès.")
+                return redirect("flux")
+        else:
+            # Logique pour créer une critique en réponse
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.user = request.user
+                review.ticket = ticket
+                review.save()
+                messages.success(request, "Critique créée avec succès.")
+                return redirect("flux")
+
+    context = {"form": form, "ticket": ticket, "can_edit": can_edit}
+    return render(request, "review/ticket_update.html", context)
+
+
 
 
 def ticket_delete(request, id):
@@ -191,32 +207,37 @@ def review_list(request):
     return render(request, 'review/review_list.html',
                   {'reviews':review})
 
+
 @login_required
 def review_create(request):
-    """
-    View to create a new review, optionally linked to an existing ticket.
-    """
-    ticket_id = request.GET.get('ticket')
+    ticket_id = request.GET.get('ticket')  # Récupère l'ID du ticket passé en paramètre GET
     ticket = None
 
+    # Vérifie si un ticket avec cet ID existe
     if ticket_id:
         try:
             ticket = Ticket.objects.get(id=ticket_id)
         except Ticket.DoesNotExist:
-            ticket = None
+            messages.error(request, "Le ticket spécifié n'existe pas.")
+            return redirect("flux")
 
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
-            review = form.save(commit=False)
+            review = form.save(commit=False)  # Ne pas enregistrer immédiatement pour ajouter des champs
             review.user = request.user
-            review.ticket = ticket  # Associer au ticket si présent
+            review.ticket = ticket
             review.save()
+            review.contributors.add(request.user)  # Ajoute l'utilisateur connecté comme contributeur
+            messages.success(request, "Votre critique a été enregistrée avec succès.")
             return redirect("flux")
+        else:
+            messages.error(request, "Une erreur s'est produite. Veuillez vérifier les champs.")
     else:
         form = ReviewForm()
 
     return render(request, "review/review_create.html", {"form": form, "ticket": ticket})
+
 
 
 def review_update(request, id):

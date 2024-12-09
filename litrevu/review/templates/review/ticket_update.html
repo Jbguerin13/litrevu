@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
-
-{% block title %} Modifier votre ticket {% endblock title %}
+{% block title %} Mettre à jour ou répondre au ticket {% endblock title %}
 
 {% block content %}
+<h2>{{ ticket.title }}</h2>
+<p>{{ ticket.description }}</p>
 
-<h1>Modifier le ticket</h1>
-
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Enregistrer">
-</form>
-
-{% endblock %}
+{% if can_edit %}
+    <h3>Modifier le ticket</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Mettre à jour</button>
+    </form>
+{% else %}
+    <h3>Répondre au ticket</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Publier la critique</button>
+    </form>
+{% endif %}
+{% endblock content %}
