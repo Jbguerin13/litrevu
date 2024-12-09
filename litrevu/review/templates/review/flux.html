@@ -13,6 +13,7 @@
         text-decoration: none;
         font-weight: bold;
         margin-top: 10px;
+        margin-right: 10px;
     }
 
     .styled-button:hover {
@@ -59,6 +60,12 @@
         width: 20px;
         height: 20px;
     }
+
+    .status-message {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+    }
 </style>
 
 <div class="flux-page base-page">
@@ -68,6 +75,7 @@
 
     <div class="connexion-button">
         <a href="{% url 'ticket_create' %}" class="styled-button">Demander une critique</a>
+        <a href="{% url 'review_create' %}" class="styled-button">Créer une critique</a>
     </div>
 
     {% if messages %}
@@ -80,7 +88,7 @@
 
     {% for post in posts %}
         {% if post.ticket %}
-            <!-- Critique -->
+            <!-- Review -->
             <div class="post-container">
                 <div class="post-header">
                     <div class="post-info">
@@ -97,7 +105,7 @@
                     </span>
                     <p>{{ post.body }}</p>
                 </div>
-                <!-- Ticket associé -->
+                <!-- Ticket -->
                 <div class="ticket-content">
                     <p><strong>Ticket lié :</strong> {{ post.ticket.title }}</p>
                     <p>{{ post.ticket.description }}</p>
@@ -121,20 +129,14 @@
                     {% if post.image %}
                         <img src="{{ post.image.url }}" alt="{{ post.title }}">
                     {% endif %}
+                    
+                    <!-- Ajout du message pour indiquer l'état de la critique -->
                     {% if not post.has_review %}
+                        <p class="status-message">Vous n'avez pas encore répondu à ce ticket.</p>
                         <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
                     {% else %}
-                        <!-- Affichage de la critique associée -->
-                        <div class="post-content">
-                            <strong>Critique associée :</strong>
-                            <p><strong>{{ post.review_set.first.headline }}</strong></p>
-                            <span class='stars'>
-                                {% for star in "x"|rjust:post.review_set.first.rating %}
-                                    ★
-                                {% endfor %}
-                            </span>
-                            <p>{{ post.review_set.first.body }}</p>
-                        </div>
+                        <p class="status-message">Vous avez répondu à ce ticket.</p>
+                        <a href="{% url 'review_update' post.review_set.first.id %}" class="styled-button">Voir votre critique</a>
                     {% endif %}
                 </div>
             </div>

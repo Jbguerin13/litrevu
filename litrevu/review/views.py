@@ -30,7 +30,6 @@ def post_ticket_review(request):
     reviews = Review.objects.filter(user=request.user)
     posts = list(tickets) + list(reviews)
 
-    # Tri des posts par date de création
     posts.sort(key=lambda x: x.time_created, reverse=True)
 
     context = {
@@ -46,16 +45,9 @@ def flux(request):
     View function to display the feed of tickets and reviews for the user, including
     those from followed users.
     """
-    # Récupère les utilisateurs suivis
     followed_users = UserFollows.objects.filter(user=request.user).values_list("followed_user", flat=True)
-
-    # Tickets des utilisateurs suivis
     tickets = Ticket.objects.filter(user__in=followed_users)
-
-    # Critiques associées aux tickets des utilisateurs suivis
     reviews = Review.objects.filter(ticket__in=tickets)
-
-    # Combinez les tickets et critiques pour un affichage groupé
     posts = sorted(
         list(tickets) + list(reviews),
         key=lambda x: x.time_created,
@@ -66,9 +58,6 @@ def flux(request):
         "posts": posts,
     }
     return render(request, "review/flux.html", context)
-
-
-
 
 # =========== Ticket ===========
 
@@ -121,9 +110,7 @@ def ticket_update(request, id):
         messages.error(request, "Ce ticket n'existe pas.")
         return redirect("flux")
 
-    # Si l'utilisateur n'est pas le créateur, il peut uniquement répondre (pas modifier)
     can_edit = ticket.user == request.user
-
     form = TicketForm(instance=ticket)
 
     if request.method == "POST":
@@ -134,7 +121,6 @@ def ticket_update(request, id):
                 messages.success(request, "Ticket mis à jour avec succès.")
                 return redirect("flux")
         else:
-            # Logique pour créer une critique en réponse
             form = ReviewForm(request.POST)
             if form.is_valid():
                 review = form.save(commit=False)
@@ -210,10 +196,9 @@ def review_list(request):
 
 @login_required
 def review_create(request):
-    ticket_id = request.GET.get('ticket')  # Récupère l'ID du ticket passé en paramètre GET
+    ticket_id = request.GET.get('ticket')
     ticket = None
 
-    # Vérifie si un ticket avec cet ID existe
     if ticket_id:
         try:
             ticket = Ticket.objects.get(id=ticket_id)
@@ -224,11 +209,11 @@ def review_create(request):
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
-            review = form.save(commit=False)  # Ne pas enregistrer immédiatement pour ajouter des champs
+            review = form.save(commit=False)
             review.user = request.user
             review.ticket = ticket
             review.save()
-            review.contributors.add(request.user)  # Ajoute l'utilisateur connecté comme contributeur
+            review.contributors.add(request.user)
             messages.success(request, "Votre critique a été enregistrée avec succès.")
             return redirect("flux")
         else:
@@ -237,7 +222,6 @@ def review_create(request):
         form = ReviewForm()
 
     return render(request, "review/review_create.html", {"form": form, "ticket": ticket})
-
 
 
 def review_update(request, id):
@@ -251,15 +235,26 @@ def review_update(request, id):
     Returns:
         HttpResponse: Renders the 'review/review_update.html' template with the update form.
     """
-    review = Review.objects.get(id=id)
+    try:
+        review = Review.objects.get(id=id)
+    except Review.DoesNotExist:
+        messages.error(request, "Cette critique n'existe pas.")
+        return redirect("flux")
+
     if request.method == "POST":
         form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
             form.save()
-            return redirect("review_list")
+            messages.success(request, "Votre critique a été mise à jour avec succès.")
+            return redirect("flux")
         else:
-            form = ReviewForm(instance=review)
+            messages.error(request, "Une erreur est survenue. Veuillez vérifier les champs.")
+    else:
+        # Initialisation du formulaire pour une requête GET
+        form = ReviewForm(instance=review)
+
     return render(request, "review/review_update.html", {"form": form})
+
 
 
 def review_delete(request, id):
@@ -310,8 +305,8 @@ def user_followed_create(request):
     if request.method == "POST":
         form = UserFollowsForm(request.POST, user=request.user)
         if form.is_valid():
-            user_follow = form.save(commit=False)  # Ne pas enregistrer immédiatement
-            user_follow.user = request.user  # Assigner l'utilisateur connecté
+            user_follow = form.save(commit=False)
+            user_follow.user = request.user  
             user_follow.save()
             return redirect("home")
     else:
