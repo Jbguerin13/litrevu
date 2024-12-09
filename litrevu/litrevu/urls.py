@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -24,31 +25,41 @@ from authentification import views
 import review.views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', LoginView.as_view(
-        template_name='authentification/login.html',
-        redirect_authenticated_user=True,
-        ), name='login'),
-    path('logout', views.logout_user, name='logout'),
-    path('home/', review.views.home, name='home'),
-    path('signup', views.signup_page, name='signup'),
-    path('ticket/', review.views.ticket_list, name='ticket_list'),
-    path('ticket/add/', review.views.ticket_create, name="ticket_create"),
-    path('ticket/<int:id>/update/', review.views.ticket_update, name="ticket_update"),
-    path('ticket/<int:id>/delete/', review.views.ticket_delete, name="ticket_delete"),
-    path('review/', review.views.review_list, name='review_list'),
-    path('review/add/', review.views.review_create, name="review_create"),
-    path('review/<int:id>/update/', review.views.review_update, name="review_update"),
-    path('review/<int:id>/delete/', review.views.review_delete, name="review_delete"),
-    path('user-followed/', review.views.user_followed_list, name='user_followed_list'),
-    path('user-followed/add/', review.views.user_followed_create, name="user_followed_create"),
-    path('user-followed/<int:id>/delete/', review.views.user_followed_delete, name="user_followed_delete"),
-    path('photo/upload/', review.views.photo_upload, name="photo_upload"),
-    path('posts/', review.views.post_ticket_review, name="posts"),
+    path("admin/", admin.site.urls),
+    path(
+        "",
+        LoginView.as_view(
+            template_name="authentification/login.html",
+            redirect_authenticated_user=True,
+        ),
+        name="login",
+    ),
+    path("logout", views.logout_user, name="logout"),
+    path("home/", review.views.home, name="home"),
+    path("signup", views.signup_page, name="signup"),
+    path("ticket/", review.views.ticket_list, name="ticket_list"),
+    path("ticket/add/", review.views.ticket_create, name="ticket_create"),
+    path("ticket/<int:id>/update/", review.views.ticket_update, name="ticket_update"),
+    path("ticket/<int:id>/delete/", review.views.ticket_delete, name="ticket_delete"),
+    path("review/", review.views.review_list, name="review_list"),
+    path("review/add/", review.views.review_create, name="review_create"),
+    path("review/<int:id>/update/", review.views.review_update, name="review_update"),
+    path("review/<int:id>/delete/", review.views.review_delete, name="review_delete"),
+    path("user-followed/", review.views.user_followed_list, name="user_followed_list"),
+    path(
+        "user-followed/add/",
+        review.views.user_followed_create,
+        name="user_followed_create",
+    ),
+    path(
+        "user-followed/<int:id>/delete/",
+        review.views.user_followed_delete,
+        name="user_followed_delete",
+    ),
+    path("photo/upload/", review.views.photo_upload, name="photo_upload"),
+    path("posts/", review.views.post_ticket_review, name="posts"),
     path("flux/", review.views.flux, name="flux"),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,7 +11,6 @@ Suivez les étapes ci-dessous pour installer et exécuter le projet LITReview lo
 
 - Python 3.9 ou version ultérieure
 - pip (gestionnaire de paquets Python)
-- Un environnement de développement intégré (IDE) comme VSCode ou PyCharm (optionnel)
 
 ### Étapes d'installation
 
@@ -44,9 +43,10 @@ Suivez les étapes ci-dessous pour installer et exécuter le projet LITReview lo
    python manage.py migrate
    ```
 
-5. **Créer un superutilisateur** (optionnel pour accéder à l'interface d'administration) :
+5. **Accès interface admin**  :
    ```bash
-   python manage.py createsuperuser
+   username : jbguerin
+   mdp : S3cret!2024
    ```
 
 6. **Lancer le serveur** :

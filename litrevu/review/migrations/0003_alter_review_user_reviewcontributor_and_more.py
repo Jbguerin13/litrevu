@@ -8,31 +8,58 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('review', '0002_alter_review_rating'),
+        ("review", "0002_alter_review_rating"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='review',
-            name='user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="review",
+            name="user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.CreateModel(
-            name='ReviewContributor',
+            name="ReviewContributor",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('contributions', models.CharField(blank=True, max_length=255)),
-                ('contributor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('review', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='review.review')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("contributions", models.CharField(blank=True, max_length=255)),
+                (
+                    "contributor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "review",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="review.review"
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('review', 'contributor')},
+                "unique_together": {("review", "contributor")},
             },
         ),
         migrations.AddField(
-            model_name='review',
-            name='contributors',
-            field=models.ManyToManyField(related_name='contributions', through='review.ReviewContributor', to=settings.AUTH_USER_MODEL),
+            model_name="review",
+            name="contributors",
+            field=models.ManyToManyField(
+                related_name="contributions",
+                through="review.ReviewContributor",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

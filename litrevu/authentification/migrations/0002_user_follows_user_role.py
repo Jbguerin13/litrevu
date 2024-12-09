@@ -7,18 +7,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentification', '0001_initial'),
+        ("authentification", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='follows',
-            field=models.ManyToManyField(limit_choices_to={'rôle': 'CREATOR'}, to=settings.AUTH_USER_MODEL, verbose_name='follow'),
+            model_name="user",
+            name="follows",
+            field=models.ManyToManyField(
+                limit_choices_to={"rôle": "CREATOR"},
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="follow",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='role',
-            field=models.CharField(choices=[('CREATOR', 'créateur de review'), ('SUBSCRIBER', 'abonné')], default='CREATOR', max_length=30, verbose_name='rôle'),
+            model_name="user",
+            name="role",
+            field=models.CharField(
+                choices=[("CREATOR", "créateur de review"), ("SUBSCRIBER", "abonné")],
+                default="CREATOR",
+                max_length=30,
+                verbose_name="rôle",
+            ),
         ),
     ]

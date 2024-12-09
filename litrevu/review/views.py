@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 # =========== Home and User Flux ===========
 
+
 @login_required
 def home(request):
     """
@@ -18,8 +19,9 @@ def home(request):
     Returns:
         HttpResponse: Renders the 'review/home.html' template with all tickets.
     """
-    tickets= Ticket.objects.all()
-    return render(request, 'review/home.html', context={'tickets': tickets})
+    tickets = Ticket.objects.all()
+    return render(request, "review/home.html", context={"tickets": tickets})
+
 
 @login_required
 def post_ticket_review(request):
@@ -42,16 +44,30 @@ def post_ticket_review(request):
 @login_required
 def flux(request):
     """
-    View function to display the feed of tickets and reviews for the user, including
-    those from followed users.
+    Fetch and display the activity feed for the logged-in user.
+
+    Process:
+    - Retrieve the list of users followed by the logged-in user.
+    - Fetch all tickets created by those followed users.
+    - Fetch all reviews associated with those tickets.
+    - Combine the tickets and reviews, sorting them by their creation time
+      (most recent first).
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user
+        authentication information.
+
+    Returns:
+        HttpResponse: The rendered "flux.html" template displaying the user's
+        activity feed.
     """
-    followed_users = UserFollows.objects.filter(user=request.user).values_list("followed_user", flat=True)
+    followed_users = UserFollows.objects.filter(user=request.user).values_list(
+        "followed_user", flat=True
+    )
     tickets = Ticket.objects.filter(user__in=followed_users)
     reviews = Review.objects.filter(ticket__in=tickets)
     posts = sorted(
-        list(tickets) + list(reviews),
-        key=lambda x: x.time_created,
-        reverse=True
+        list(tickets) + list(reviews), key=lambda x: x.time_created, reverse=True
     )
 
     context = {
@@ -59,7 +75,9 @@ def flux(request):
     }
     return render(request, "review/flux.html", context)
 
+
 # =========== Ticket ===========
+
 
 def ticket_list(request):
     """
@@ -72,11 +90,10 @@ def ticket_list(request):
         HttpResponse: Renders the 'review/ticket_list.html' template with all tickets.
     """
     tickets = Ticket.objects.all()
-    return render(request, 'review/ticket_list.html',
-                  {'tickets':tickets})
+    return render(request, "review/ticket_list.html", {"tickets": tickets})
 
 
-def ticket_create(request): 
+def ticket_create(request):
     """
     View function to create a new ticket.
 
@@ -102,7 +119,29 @@ def ticket_create(request):
 @login_required
 def ticket_update(request, id):
     """
-    View function to allow responding to an existing ticket.
+    Handle ticket update or response creation.
+
+    This function serves two purposes:
+    1. Allow the owner of a ticket to edit it.
+    2. Allow other users to respond to the ticket by creating a review.
+
+    Process:
+    - Fetch the ticket by its ID. If it does not exist, redirect to the feed
+      with an error message.
+    - Determine if the logged-in user is the owner of the ticket (can_edit).
+    - Handle `POST` requests:
+        - If the user owns the ticket, process the `TicketForm` to update it.
+        - If the user does not own the ticket, process the `ReviewForm` to
+          create a review for the ticket.
+    - Render the "ticket_update.html" template with the appropriate form.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user data and form data.
+        id (int): The ID of the ticket to update or respond to.
+
+    Returns:
+        HttpResponse: The rendered "ticket_update.html" template.
+        Redirects to the feed with a success or error message upon completion.
     """
     try:
         ticket = Ticket.objects.get(id=id)
@@ -134,8 +173,6 @@ def ticket_update(request, id):
     return render(request, "review/ticket_update.html", context)
 
 
-
-
 def ticket_delete(request, id):
     """
     View function to delete an existing ticket.
@@ -148,12 +185,13 @@ def ticket_delete(request, id):
         HttpResponse: Renders the 'review/ticket_delete.html' template or redirects to ticket list.
     """
     ticket = Ticket.objects.get(id=id)
-    
+
     if request.method == "POST":
         ticket.delete()
         return redirect("ticket_list")
-    
+
     return render(request, "review/ticket_delete.html", {"ticket": ticket})
+
 
 def photo_upload(request):
     """
@@ -172,8 +210,8 @@ def photo_upload(request):
             ticket = form.save(commit=False)
             ticket.uploader = request.user
             ticket.save()
-            return redirect('home')
-    return render(request, 'review/photo_upload.html', context={'form': form})
+            return redirect("home")
+    return render(request, "review/photo_upload.html", context={"form": form})
 
 
 # =========== Review ===========
@@ -190,13 +228,34 @@ def review_list(request):
         HttpResponse: Renders the 'review/review_list.html' template with all reviews.
     """
     review = Review.objects.all()
-    return render(request, 'review/review_list.html',
-                  {'reviews':review})
+    return render(request, "review/review_list.html", {"reviews": review})
 
 
 @login_required
 def review_create(request):
-    ticket_id = request.GET.get('ticket')
+    """
+    Create a review for an existing ticket.
+
+    Process:
+    - If a `ticket_id` is provided:
+        - Fetch the ticket by its ID. If it does not exist, redirect to the feed with an error message.
+    - For `POST` requests:
+        - Validate the form data using `ReviewForm`.
+        - Save the review with the current user and associated ticket.
+        - Add the user to the review's contributors list.
+        - Redirect to the feed with a success message.
+    - For non-`POST` requests:
+        - Render the empty `ReviewForm`.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user data and form data.
+
+    Returns:
+        HttpResponse: The rendered "review_create.html" template.
+        Redirects to the feed with a success or error message upon completion.
+    """
+
+    ticket_id = request.GET.get("ticket")
     ticket = None
 
     if ticket_id:
@@ -217,11 +276,15 @@ def review_create(request):
             messages.success(request, "Votre critique a été enregistrée avec succès.")
             return redirect("flux")
         else:
-            messages.error(request, "Une erreur s'est produite. Veuillez vérifier les champs.")
+            messages.error(
+                request, "Une erreur s'est produite. Veuillez vérifier les champs."
+            )
     else:
         form = ReviewForm()
 
-    return render(request, "review/review_create.html", {"form": form, "ticket": ticket})
+    return render(
+        request, "review/review_create.html", {"form": form, "ticket": ticket}
+    )
 
 
 def review_update(request, id):
@@ -248,13 +311,13 @@ def review_update(request, id):
             messages.success(request, "Votre critique a été mise à jour avec succès.")
             return redirect("flux")
         else:
-            messages.error(request, "Une erreur est survenue. Veuillez vérifier les champs.")
+            messages.error(
+                request, "Une erreur est survenue. Veuillez vérifier les champs."
+            )
     else:
-        # Initialisation du formulaire pour une requête GET
         form = ReviewForm(instance=review)
 
     return render(request, "review/review_update.html", {"form": form})
-
 
 
 def review_delete(request, id):
@@ -269,15 +332,16 @@ def review_delete(request, id):
         HttpResponse: Renders the 'review/review_delete.html' template or redirects to review list.
     """
     review = Review.objects.get(id=id)
-    
+
     if request.method == "POST":
         review.delete()
         return redirect("review_list")
-    
+
     return render(request, "review/review_delete.html", {"review": review})
 
 
 # =========== UserFollow ===========
+
 
 def user_followed_list(request):
     """
@@ -293,25 +357,47 @@ def user_followed_list(request):
     users_followed = UserFollows.objects.filter(user=user)
     followers = UserFollows.objects.filter(followed_user=user)
 
-    return render(request, 'review/user_followed_list.html', {
-        'users_followed': users_followed,
-        'followers': followers,
-    })
+    return render(
+        request,
+        "review/user_followed_list.html",
+        {
+            "users_followed": users_followed,
+            "followers": followers,
+        },
+    )
+
 
 def user_followed_create(request):
     """
-    View function to create a new user follow relationship.
+    Create a new "followed user" relationship for the current user.
+
+    Process:
+    - For `POST` requests:
+        - Validate the form data using `UserFollowsForm`.
+        - Create a new `UserFollows` instance associating the logged-in user with the followed user.
+        - Save the relationship in the database.
+        - Redirect to the home page upon success.
+    - For non-`POST` requests:
+        - Render the `UserFollowsForm` for the user to select a user to follow.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user data and form data.
+
+    Returns:
+        HttpResponse: The rendered "user_followed_create.html" template with the form.
+        Redirects to the home page upon successful form submission.
     """
     if request.method == "POST":
         form = UserFollowsForm(request.POST, user=request.user)
         if form.is_valid():
             user_follow = form.save(commit=False)
-            user_follow.user = request.user  
+            user_follow.user = request.user
             user_follow.save()
             return redirect("home")
     else:
         form = UserFollowsForm(user=request.user)
     return render(request, "review/user_followed_create.html", context={"form": form})
+
 
 def user_followed_delete(request, id):
     """
@@ -325,9 +411,11 @@ def user_followed_delete(request, id):
         HttpResponse: Renders the 'review/user_followed_delete.html' template or redirects to followed list.
     """
     user_followed = UserFollows.objects.get(id=id)
-    
+
     if request.method == "POST":
         user_followed.delete()
         return redirect("user_followed_list")
-    
-    return render(request, "review/user_followed_delete.html", {"user_followed": user_followed})
+
+    return render(
+        request, "review/user_followed_delete.html", {"user_followed": user_followed}
+    )
