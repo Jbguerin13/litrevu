@@ -1,15 +1,31 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Confirmer la suppression{% endblock title %}
 
 {% block content %}
-
-<h2>Supprimer le suivi de cet utilisateur ?</h2>
-
-<p><strong>{{ user_followed.followed_user }}</strong></p>
-
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit">Confirmer la suppression</button>
-    <a href="{% url 'ticket_list' %}">Annuler</a>
-</form>
-
-{% endblock %}
+<div style="max-width: 600px; margin: auto; text-align: center;">
+    <h2>Confirmer la suppression</h2>
+    <p>Êtes-vous sûr de vouloir vous désabonner de <strong>{{ user_followed.followed_user.username }}</strong> ?</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit" style="
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;">
+            Confirmer
+        </button>
+        <a href="{% url 'user_followed_list' %}" style="
+            padding: 10px 20px;
+            background-color: #ccc;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-left: 10px;">
+            Annuler
+        </a>
+    </form>
+</div>
+{% endblock content %}

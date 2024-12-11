@@ -72,7 +72,6 @@ def flux(request):
     )
     tickets = Ticket.objects.filter(user__in=followed_users)
 
-    # Annotate tickets
     tickets = tickets.annotate(
         user_review_exists=Exists(
             Review.objects.filter(ticket=OuterRef('pk'), user=request.user)
@@ -83,7 +82,8 @@ def flux(request):
         ),
     )
 
-    reviews = Review.objects.filter(ticket__in=tickets)
+    reviews = Review.objects.filter(ticket__in=tickets).exclude(user=request.user)
+    
     posts = sorted(
         list(tickets) + list(reviews), key=lambda x: x.time_created, reverse=True
     )
@@ -417,6 +417,7 @@ def user_followed_create(request):
     return render(request, "review/user_followed_create.html", context={"form": form})
 
 
+@login_required
 def user_followed_delete(request, id):
     """
     View function to delete an existing user follow relationship.
@@ -426,12 +427,14 @@ def user_followed_delete(request, id):
         id (int): The ID of the user follow relationship to be deleted.
 
     Returns:
-        HttpResponse: Renders the 'review/user_followed_delete.html' template or redirects to followed list.
+        HttpResponse: Redirects to the 'user_followed_list' page or renders
+        a confirmation template if the request method is GET.
     """
-    user_followed = UserFollows.objects.get(id=id)
+    user_followed = get_object_or_404(UserFollows, id=id, user=request.user)
 
     if request.method == "POST":
         user_followed.delete()
+        messages.success(request, f"Vous vous êtes désabonné de {user_followed.followed_user.username}.")
         return redirect("user_followed_list")
 
     return render(
