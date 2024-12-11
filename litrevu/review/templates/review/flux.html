@@ -129,8 +129,8 @@
                         <img src="{{ post.image.url }}" alt="{{ post.title }}">
                     {% endif %}
                     
-                    <!-- Add log to indicate the review state -->
-                    {% if not post.has_review %}
+                    <!-- Check if the user has responded -->
+                    {% if not post.user_review_exists %}
                         <p class="status-message">Vous n'avez pas encore répondu à ce ticket.</p>
                         <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
                     {% else %}

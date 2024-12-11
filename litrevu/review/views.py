@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from review.models import Ticket, Review, UserFollows
 from review.forms import TicketForm, ReviewForm, UserFollowsForm
 from django.shortcuts import get_object_or_404
+from django.db import models
+
 
 # =========== Home and User Flux ===========
 
@@ -52,6 +54,7 @@ def flux(request):
     - Fetch all reviews associated with those tickets.
     - Combine the tickets and reviews, sorting them by their creation time
       (most recent first).
+    - Annotate each ticket with a flag indicating if the user has responded.
 
     Args:
         request (HttpRequest): The HTTP request object containing user
@@ -65,6 +68,13 @@ def flux(request):
         "followed_user", flat=True
     )
     tickets = Ticket.objects.filter(user__in=followed_users)
+
+    tickets = tickets.annotate(
+        user_review_exists=models.Exists(
+            Review.objects.filter(ticket=models.OuterRef('pk'), user=request.user)
+        )
+    )
+
     reviews = Review.objects.filter(ticket__in=tickets)
     posts = sorted(
         list(tickets) + list(reviews), key=lambda x: x.time_created, reverse=True
@@ -74,6 +84,7 @@ def flux(request):
         "posts": posts,
     }
     return render(request, "review/flux.html", context)
+
 
 
 # =========== Ticket ===========
