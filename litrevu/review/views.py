@@ -128,7 +128,7 @@ def ticket_create(request):
             ticket = form.save(commit=False)
             ticket.user = request.user
             ticket.save()
-            return redirect("post_ticket_review")
+            return redirect("posts")
         else:
             messages.error(request, "Une erreur s'est produite. Veuillez vérifier les champs.")
     return render(request, "review/ticket_create.html", {"form": form})
