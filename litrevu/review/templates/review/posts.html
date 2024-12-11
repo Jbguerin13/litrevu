@@ -75,38 +75,7 @@
     {% endif %}
 
     {% for post in posts %}
-        {% if post.ticket %}
-            <!-- Review -->
-            <div class="post-container">
-                <div class="post-header">
-                    <div class="post-info">
-                        <strong>Vous avez publié une critique</strong>
-                        <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p><strong>{{ post.headline }}</strong></p>
-                    <span class='stars'>
-                        {% for star in "x"|rjust:post.rating %}
-                            ★
-                        {% endfor %}
-                    </span>
-                    <p>{{ post.body }}</p>
-                </div>
-                <!-- Tickets associat -->
-                <div class="ticket-content">
-                    <p><strong>Ticket lié :</strong> {{ post.ticket.title }}</p>
-                    <p>{{ post.ticket.description }}</p>
-                    {% if post.ticket.image %}
-                        <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
-                    {% endif %}
-                </div>
-                <div class="connexion-button">
-                    <a href="{% url 'review_update' post.id %}" class="styled-button">Modifier la critique</a>
-                    <a href="{% url 'review_delete' post.id %}" class="styled-button">Supprimer la critique</a>
-                </div>
-            </div>
-        {% else %}
+        {% if post.title and post.description %}
             <!-- Ticket -->
             <div class="post-container">
                 <div class="post-header">
@@ -127,6 +96,39 @@
                         <a href="{% url 'ticket_update' post.id %}" class="styled-button">Modifier le ticket</a>
                     {% endif %}
                     <a href="{% url 'ticket_delete' post.id %}" class="styled-button">Supprimer le ticket</a>
+                </div>
+            </div>
+        {% elif post.headline and post.rating %}
+            <!-- Review -->
+            <div class="post-container">
+                <div class="post-header">
+                    <div class="post-info">
+                        <strong>Vous avez publié une critique</strong>
+                        <span class="post-date">{{ post.time_created|date:"H:i, d M Y" }}</span>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p><strong>{{ post.headline }}</strong></p>
+                    <span class='stars'>
+                        {% for star in "x"|rjust:post.rating %}
+                            ★
+                        {% endfor %}
+                    </span>
+                    <p>{{ post.body }}</p>
+                </div>
+                <!-- Ticket lié -->
+                {% if post.ticket %}
+                    <div class="ticket-content">
+                        <p><strong>Ticket lié :</strong> {{ post.ticket.title }}</p>
+                        <p>{{ post.ticket.description }}</p>
+                        {% if post.ticket.image %}
+                            <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="connexion-button">
+                    <a href="{% url 'review_update' post.id %}" class="styled-button">Modifier la critique</a>
+                    <a href="{% url 'review_delete' post.id %}" class="styled-button">Supprimer la critique</a>
                 </div>
             </div>
         {% endif %}

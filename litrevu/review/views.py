@@ -14,7 +14,7 @@ from django.db.models import Exists, OuterRef, Subquery
 @login_required
 def home(request):
     """
-    View function for the home page
+    View function for the home page.
 
     Args:
         request: The HTTP request object.
@@ -253,15 +253,14 @@ def review_list(request):
 @login_required
 def review_create(request):
     """
-    Create a review for an existing ticket.
+    Create a review with or without a ticket.
 
     Process:
     - If a `ticket_id` is provided:
-        - Fetch the ticket by its ID. If it does not exist, redirect to the feed with an error message.
+        - Fetch the ticket by its ID.
     - For `POST` requests:
         - Validate the form data using `ReviewForm`.
-        - Save the review with the current user and associated ticket.
-        - Add the user to the review's contributors list.
+        - Save the review with the current user and associated ticket if it exists.
         - Redirect to the feed with a success message.
     - For non-`POST` requests:
         - Render the empty `ReviewForm`.
@@ -271,7 +270,6 @@ def review_create(request):
 
     Returns:
         HttpResponse: The rendered "review_create.html" template.
-        Redirects to the feed with a success or error message upon completion.
     """
 
     ticket_id = request.GET.get("ticket")
@@ -289,21 +287,20 @@ def review_create(request):
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
-            review.ticket = ticket
+            if ticket:  # Associer un ticket si présent
+                review.ticket = ticket
             review.save()
-            review.contributors.add(request.user)
             messages.success(request, "Votre critique a été enregistrée avec succès.")
             return redirect("flux")
         else:
-            messages.error(
-                request, "Une erreur s'est produite. Veuillez vérifier les champs."
-            )
+            messages.error(request, "Une erreur s'est produite. Veuillez vérifier les champs.")
     else:
         form = ReviewForm()
 
     return render(
         request, "review/review_create.html", {"form": form, "ticket": ticket}
     )
+
 
 
 def review_update(request, id):

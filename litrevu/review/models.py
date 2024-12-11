@@ -52,7 +52,7 @@ class Review(models.Model):
         contributors (ManyToManyField): A list of users who contributed to the review.
     """
 
-    ticket = models.ForeignKey(to=Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(to=Ticket, on_delete=models.CASCADE, null=True, blank=True)
     rating = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
