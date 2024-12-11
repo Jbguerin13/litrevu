@@ -130,13 +130,14 @@
                     {% endif %}
                     
                     <!-- Check if the user has responded -->
-                    {% if not post.user_review_exists %}
+                    {% if post.user_review_exists %}
+                        <p class="status-message">Vous avez répondu à ce ticket.</p>
+                        <a href="{% url 'review_update' post.user_review_id %}" class="styled-button">Voir votre critique</a>
+                    {% else %}
                         <p class="status-message">Vous n'avez pas encore répondu à ce ticket.</p>
                         <a href="{% url 'review_create' %}?ticket={{ post.id }}" class="styled-button">Répondre à ce ticket</a>
-                    {% else %}
-                        <p class="status-message">Vous avez répondu à ce ticket.</p>
-                        <a href="{% url 'review_update' post.review_set.first.id %}" class="styled-button">Voir votre critique</a>
                     {% endif %}
+
                 </div>
             </div>
         {% endif %}
