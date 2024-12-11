@@ -14,16 +14,17 @@ from django.db.models import Exists, OuterRef, Subquery
 @login_required
 def home(request):
     """
-    View function for the home page, displaying all tickets.
+    View function for the home page
 
     Args:
         request: The HTTP request object.
 
     Returns:
-        HttpResponse: Renders the 'review/home.html' template with all tickets.
+        HttpResponse: Renders the 'review/home.html'
     """
-    tickets = Ticket.objects.all()
-    return render(request, "review/home.html", context={"tickets": tickets})
+    
+    return render(request, "review/home.html")
+
 
 
 @login_required

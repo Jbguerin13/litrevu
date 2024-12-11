@@ -1,117 +1,122 @@
-<html>
-    <head>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-            }
-            .container {
-                width: 80%;
-                margin: 0 auto;
-                padding: 20px;
-                border: 1px solid black;
-            }
-            .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid black;
-                padding-bottom: 10px;
-            }
-            .header h1 {
-                margin: 0 auto;
-                text-align: center;
-            }
-            .content {
-                display: block;
-                justify-content: space-between;
-                align-items: center;
-                border-top: 1px solid black;
-            }
-            .box {
-                width: 45%;
-                text-align: center;
-                border: 1px solid black;
-                padding: 20px;
-            }
-            form {
-                max-width: 600px;
-                margin: auto;
-            }
-            fieldset {
-                margin-bottom: 20px;
-                padding: 20px;
-                border: 1px solid #ccc;
-            }
-            fieldset legend {
-                font-weight: bold;
-                padding: 0 10px;
-            }
-            fieldset div {
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 15px;
-            }
-            fieldset label {
-                margin-bottom: 5px;
-                font-weight: bold;
-            }
-            fieldset input[type="text"],
-            fieldset textarea,
-            fieldset input[type="file"] {
-                width: 100%;
-                padding: 8px;
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-            fieldset input[type="radio"] {
-                width: auto;
-                margin-right: 5px;
-            }
-            fieldset .rating-container {
-                display: flex;
-                gap: 10px;
-            }
-            input[type="submit"] {
-                padding: 10px 20px;
-                font-size: 16px;
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            input[type="submit"]:hover {
-                background-color: #45a049;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <span id="page-title" style="font-size: 18px; text-align: center;">{% block title %}{% endblock title %}</span>
-            <div class="litreview">
-                <h1>LITReview</h1>
-            </div>
-                <span id="page-nav" style="font-size: 15px;">
-                    <a href="{% url 'flux' %}">Flux</a>
-                    <a href="{% url 'posts' %}">Posts</a>
-                    <a href="{% url 'user_followed_list' %}">Abonnements</a>
-                    <a href="{% url 'logout' %}">Se déconnecter</a>
-                </span>
-            </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LITReview - Application de gestion de critiques littéraires">
+    <title>{% block title %}LITReview{% endblock title %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            background-color: #f9f9f9;
+            color: #333;
+        }
 
-            {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-            <div class="content">
-                {% block content %}{% endblock content %}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        .messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .messages li {
+            background-color: #ffefc1;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .nav-links a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        input[type="submit"], .styled-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2F855A;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover, .styled-button:hover {
+            background-color: #276749;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        a {
+            outline: none;
+        }
+
+        a:focus {
+            outline: 2px solid #2F855A;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LITReview</h1>
+            <div class="nav-links" aria-label="Navigation principale">
+                <a href="{% url 'flux' %}" aria-label="Aller au flux">Flux</a>
+                <a href="{% url 'posts' %}" aria-label="Voir vos posts">Posts</a>
+                <a href="{% url 'user_followed_list' %}" aria-label="Gérer vos abonnements">Abonnements</a>
+                <a href="{% url 'logout' %}" aria-label="Se déconnecter">Se déconnecter</a>
             </div>
         </div>
-    </body>
+
+        {% if messages %}
+            <ul class="messages" role="alert">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <div class="content">
+            {% block content %}{% endblock content %}
+        </div>
+    </div>
+</body>
 </html>
