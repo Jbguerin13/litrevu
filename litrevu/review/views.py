@@ -5,7 +5,7 @@ from review.models import Ticket, Review, UserFollows
 from review.forms import TicketForm, ReviewForm, UserFollowsForm
 from django.shortcuts import get_object_or_404
 from django.db.models import Exists, OuterRef, Subquery
-
+from django.db import models
 
 
 # =========== Home and User Flux ===========
@@ -50,15 +50,8 @@ def flux(request):
     """
     Fetch and display the activity feed for the logged-in user.
 
-    Process:
-    - Retrieve the list of users followed by the logged-in user.
-    - Fetch all tickets created by those followed users.
-    - Annotate each ticket with:
-        - A flag indicating if the logged-in user has responded.
-        - The ID of the user's review, if it exists.
-    - Fetch all reviews associated with those tickets.
-    - Combine the tickets and reviews, sorting them by their creation time
-      (most recent first).
+    - Show the user's own tickets and reviews.
+    - Show tickets and reviews only from followed users.
 
     Args:
         request (HttpRequest): The HTTP request object containing user
@@ -71,9 +64,10 @@ def flux(request):
     followed_users = UserFollows.objects.filter(user=request.user).values_list(
         "followed_user", flat=True
     )
-    tickets = Ticket.objects.filter(user__in=followed_users)
 
-    tickets = tickets.annotate(
+    tickets = Ticket.objects.filter(
+        models.Q(user__in=followed_users) | models.Q(user=request.user)
+    ).annotate(
         user_review_exists=Exists(
             Review.objects.filter(ticket=OuterRef('pk'), user=request.user)
         ),
@@ -82,9 +76,9 @@ def flux(request):
             .values('id')[:1]
         ),
     )
-
-    reviews = Review.objects.filter(ticket__in=tickets).exclude(user=request.user)
-    
+    reviews = Review.objects.filter(
+        models.Q(ticket__in=tickets) | models.Q(user__in=followed_users)
+    )
     posts = sorted(
         list(tickets) + list(reviews), key=lambda x: x.time_created, reverse=True
     )
@@ -93,6 +87,7 @@ def flux(request):
         "posts": posts,
     }
     return render(request, "review/flux.html", context)
+
 
 
 # =========== Ticket ===========
