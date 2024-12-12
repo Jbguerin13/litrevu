@@ -385,7 +385,7 @@ def user_followed_list(request):
 
 def user_followed_create(request):
     """
-    Create a new "followed user" relationship for the current user.
+    Create a new "followed user".
 
     Process:
     - For `POST` requests:
@@ -407,7 +407,6 @@ def user_followed_create(request):
         form = UserFollowsForm(request.POST, user=request.user)
         if form.is_valid():
             followed_user = form.cleaned_data['followed_user']
-            # Vérifier si l'utilisateur suit déjà
             if UserFollows.objects.filter(user=request.user, followed_user=followed_user).exists():
                 messages.error(request, f"Vous suivez déjà {followed_user.username}.")
             else:
