@@ -167,6 +167,9 @@ def ticket_update(request, id):
     except Ticket.DoesNotExist:
         messages.error(request, "Ce ticket n'existe pas.")
         return redirect("flux")
+    
+    if ticket.user != request.user:
+        return redirect("flux")
 
     can_edit = ticket.user == request.user
     form = TicketForm(instance=ticket)
@@ -204,6 +207,9 @@ def ticket_delete(request, id):
         HttpResponse: Renders the 'review/ticket_delete.html' template or redirects to ticket list.
     """
     ticket = Ticket.objects.get(id=id)
+    
+    if ticket.user != request.user:
+        return redirect("flux")
 
     if request.method == "POST":
         ticket.delete()
@@ -319,6 +325,9 @@ def review_update(request, id):
     except Review.DoesNotExist:
         messages.error(request, "Cette critique n'existe pas.")
         return redirect("flux")
+    
+    if review.user != request.user:
+        return redirect("flux")
 
     if request.method == "POST":
         form = ReviewForm(request.POST, instance=review)
@@ -348,6 +357,9 @@ def review_delete(request, id):
         HttpResponse: Renders the 'review/review_delete.html' template or redirects to review list.
     """
     review = Review.objects.get(id=id)
+    
+    if review.user != request.user:
+        return redirect("flux")
 
     if request.method == "POST":
         review.delete()
