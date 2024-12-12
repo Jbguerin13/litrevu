@@ -406,10 +406,16 @@ def user_followed_create(request):
     if request.method == "POST":
         form = UserFollowsForm(request.POST, user=request.user)
         if form.is_valid():
-            user_follow = form.save(commit=False)
-            user_follow.user = request.user
-            user_follow.save()
-            return redirect("home")
+            followed_user = form.cleaned_data['followed_user']
+            # Vérifier si l'utilisateur suit déjà
+            if UserFollows.objects.filter(user=request.user, followed_user=followed_user).exists():
+                messages.error(request, f"Vous suivez déjà {followed_user.username}.")
+            else:
+                user_follow = form.save(commit=False)
+                user_follow.user = request.user
+                user_follow.save()
+                messages.success(request, f"Vous suivez maintenant {followed_user.username}.")
+                return redirect("user_followed_list")
     else:
         form = UserFollowsForm(user=request.user)
     return render(request, "review/user_followed_create.html", context={"form": form})
