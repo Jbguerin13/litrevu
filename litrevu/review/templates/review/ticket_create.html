@@ -6,9 +6,8 @@
 
 <div style="display: flex; flex-direction: column; align-items: center;">
     <h1>Créer un ticket</h1>
-    <form action="" method="post">
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-
         <fieldset>
             <div>
                 <label for="ticket_title_id">Titre</label>
@@ -26,7 +25,7 @@
         <div>
             <input type="submit" value="Envoyer">
         </div>
-    </form>
+    </form>    
 </div>
 
 {% endblock %}
